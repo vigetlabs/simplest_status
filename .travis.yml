@@ -40,3 +40,6 @@ matrix:
     - rvm: 2.2.2
       gemfile: gemfiles/rails_40.gemfile
 before_install: gem install bundler -v 1.10.2
+addons:
+  code_climate:
+    repo_token: 406484919b3c7b57d10643c465efb9cbe9109a59ea6b5d64fb099c6c1e81a9f4

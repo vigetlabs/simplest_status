@@ -7,6 +7,10 @@ module SimplestStatus
   def statuses(*status_list)
     @statuses ||= status_list.reduce(StatusCollection.new) do |collection, status|
       collection.add(status)
-    end.tap { send(:include, ModelMethods) unless ancestors.include? ModelMethods }
+    end
+
+    send(:include, ModelMethods) unless ancestors.include? ModelMethods
+
+    @statuses
   end
 end

@@ -8,7 +8,7 @@ RSpec.describe SimplestStatus::StatusCollection do
   subject { described_class.new }
 
   describe "#each" do
-    subject { described_class.new.merge!(boom: 0, shaka: 1, laka: 2) }
+    subject { described_class.new.merge!(:boom => 0, :shaka => 1, :laka => 2) }
 
     it "yields each key/value as a Simplest::Status object" do
       expect { |block| subject.each(&block) }.to yield_successive_args(boom, shaka, laka)
@@ -17,11 +17,11 @@ RSpec.describe SimplestStatus::StatusCollection do
 
   describe "#add" do
     it "returns the collection with the added record" do
-      expect(subject.add(:testing)).to eq(testing: 0)
+      expect(subject.add(:testing)).to eq(:testing => 0)
     end
 
     context "when given an explicit value" do
-      it { expect(subject.add(:testing, 5)).to eq(testing: 5) }
+      it { expect(subject.add(:testing, 5)).to eq(:testing => 5) }
     end
   end
 
@@ -75,7 +75,7 @@ RSpec.describe SimplestStatus::StatusCollection do
   end
 
   describe "#for_select" do
-    subject { described_class.new.merge!(boom: 0, shaka: 1, laka: 2) }
+    subject { described_class.new.merge!(:boom => 0, :shaka => 1, :laka => 2) }
 
     it { expect(subject.for_select).to eq [['Boom', 0], ['Shaka', 1], ['Laka', 2]] }
   end

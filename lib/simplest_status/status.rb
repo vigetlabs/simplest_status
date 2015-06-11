@@ -36,7 +36,7 @@ module SimplestStatus
     end
 
     def ==(status)
-      Hash(self) == Hash(status)
+      self.to_hash == status.to_hash
     end
   end
 end

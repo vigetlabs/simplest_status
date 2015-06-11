@@ -11,9 +11,7 @@ RSpec.describe SimplestStatus::StatusCollection do
     subject { described_class.new.merge!(boom: 0, shaka: 1, laka: 2) }
 
     it "yields each key/value as a Simplest::Status object" do
-      expect do |block|
-        subject.each(&block).to yield_successive_args(boom, shaka, laka)
-      end
+      expect { |block| subject.each(&block) }.to yield_successive_args(boom, shaka, laka)
     end
   end
 

@@ -15,6 +15,10 @@ RSpec.describe SimplestStatus::ModelMethods do
     end
 
     include SimplestStatus::ModelMethods
+
+    def status
+      self.class.statuses[super]
+    end
   end
 
   describe "when included in a model" do
@@ -31,6 +35,12 @@ RSpec.describe SimplestStatus::ModelMethods do
     end
 
     it "defines instance-level predicate methods" do
+      expect(MockModel.new(:boom).boom?).to eq true
+      expect(MockModel.new(:shaka).boom?).to eq false
+      expect(MockModel.new(:laka).boom?).to eq false
+    end
+
+    it "defines instance-level status mutation methods" do
       MockModel.new(:boom).tap do |subject|
         expect(subject).to receive(:update_attributes).with(:status => 2)
 

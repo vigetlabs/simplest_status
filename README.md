@@ -1,8 +1,8 @@
-# SimplestStatus
+# SimplestStatus [![Gem Version](https://badge.fury.io/rb/simplest_status.svg)](http://badge.fury.io/rb/simplest_status) [![Code Climate](https://codeclimate.com/github/vigetlabs/simplest_status/badges/gpa.svg)](https://codeclimate.com/github/vigetlabs/simplest_status) [![Test Coverage](https://codeclimate.com/github/vigetlabs/simplest_status/badges/coverage.svg)](https://codeclimate.com/github/vigetlabs/simplest_status/coverage) [![Build Status](https://travis-ci.org/vigetlabs/simplest_status.svg)]((https://travis-ci.org/vigetlabs/simplest_status))
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/simplest_status`. To experiment with that code, run `bin/console` for an interactive prompt.
+SimplestStatus is a gem built to provide simple, convenient status functionality for Rails models.
 
-TODO: Delete this and the text above, and describe your gem
+SimplestStatus is similar to the recently introduced [`enum`](http://api.rubyonrails.org/classes/ActiveRecord/Enum.html) (debuted in Rails 4.1), but is different in that it's Rails version-agnostic, geared specifically toward `status` columns, and provides additional functionality.
 
 ## Installation
 
@@ -21,15 +21,95 @@ Or install it yourself as:
     $ gem install simplest_status
 
 ## Usage
+Add an `integer`-type `status` field to a model with `:null => false` and `:default => 0`:
+```ruby
+class AddStatusToPostsMigration < ActiveRecord::Migration
+  def change
+    add_column :posts, :status, :integer, :null => false, :default => 0
+  end
+end
+```
+Then in your model, extend `SimplestStatus` and list out your statuses:
+```ruby
+class Post < ActiveRecord::Base
+  extend SimplestStatus
 
-TODO: Write usage instructions here
+  statuses :draft, :preview, :published, :archived
+end
+```
 
-## Development
+This will generate a number of constants, methods, and model validations.
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake rspec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+#### Status List
+```ruby
+Post.statuses # => { :draft => 0, :preview => 1, :published => 2, :archived => 3 }
+```
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+The returned hash is a [`StatusCollection`](link) that, when iterated over, yields [`Status`](link) objects:
+```
+Post.statuses.first.tap do |status|
+  status.name          # => :draft
+  status.value         # => 0
+  status.string        # => 'draft'
+  status.to_hash       # => { :draft => 0 }
+  status.constant_name # => 'DRAFT'
+  status.label         # => 'Draft'
+  status.for_select    # => ['Draft', 0]
+end
+```
 
-## Contributing
+It also provides a helper method for usage in a form select:
+```ruby
+Post.statuses.for_select # => [['Draft', 0], ['Preview', 1], ['Published', 2], ['Archived', 3]]
+```
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/simplest_status.
+#### Constants
+Instead of referring to status values by the underlying integer, SimplestStatus generates constants for this purpose:
+```ruby
+Post::DRAFT     # => 0
+Post::PREVIEW   # => 1
+Post::PUBLISHED # => 2
+Post::ARCHIVED  # => 3
+```
+
+#### Scopes
+```ruby
+Post.draft
+Post.preview
+Post.published
+Post.archived
+```
+
+#### Predicate Methods
+```ruby
+Post.new(:status => Post::DRAFT) do |post|
+  post.draft?     # => true
+  post.preview?   # => false
+  post.published? # => false
+  post.archived?  # => false
+end
+```
+
+#### Status Mutation Methods
+```ruby
+Post.new(:status => Post::ARCHIVED) do
+  post.draft      # status from Post::ARCHIVED to Post::DRAFT
+  post.preview    # status from Post::DRAFT to Post::PREVIEW
+  post.published  # status from Post::PREVIEW to Post::PUBLISHED
+  post.archived   # status from Post::PUBLISHED to Post::ARCHIVED
+end
+```
+
+#### Status Label Method
+```ruby
+Post.new(:status => Post::DRAFT).status_label     # => 'Draft'
+Post.new(:status => Post::PREVIEW).status_label   # => 'Preview'
+Post.new(:status => Post::PUBLISHED).status_label # => 'Published'
+Post.new(:status => Post::ARCHIVED).status_label  # => 'Archived'
+```
+
+#### Status Validations
+SimplestStatus will automatically add the following validations:
+```ruby
+validate :status, :presence => true, :inclusion => { :in => proc { statuses.values } }
+```

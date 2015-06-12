@@ -2,7 +2,7 @@
 
 SimplestStatus is a gem built to provide simple, convenient status functionality for Rails models.
 
-SimplestStatus is similar to the recently introduced [`enum`](http://api.rubyonrails.org/classes/ActiveRecord/Enum.html) (debuted in Rails 4.1), but is different in that it's Rails version-agnostic, geared specifically toward `status` columns, and provides additional functionality.
+SimplestStatus is similar to the recently introduced [`enum`](http://api.rubyonrails.org/classes/ActiveRecord/Enum.html) (debuted in Rails 4.1), but is different in that it's Rails version-agnostic, geared specifically toward `status` columns, and provides additional functionality like constant-based status lookup and label helpers.
 
 ## Installation
 

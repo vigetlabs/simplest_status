@@ -5,6 +5,7 @@ rvm:
   - 2.1.0
   - 2.2.2
 gemfile:
+  - gemfiles/rails_20.gemfile
   - gemfiles/rails_31.gemfile
   - gemfiles/rails_32.gemfile
   - gemfiles/rails_40.gemfile
@@ -12,6 +13,8 @@ gemfile:
   - gemfiles/rails_42.gemfile
 matrix:
   exclude:
+    - rvm: 2.2.2
+      gemfile: gemfiles/rails_20.gemfile
     - rvm: 2.2.2
       gemfile: gemfiles/rails_31.gemfile
     - rvm: 2.2.2

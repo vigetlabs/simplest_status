@@ -8,14 +8,22 @@ RSpec.describe SimplestStatus do
   context "when extended by a model" do
     class EmptyModel
       extend SimplestStatus
+
+      def self.validates(*args)
+        #no op
+      end
+
+      statuses :boom, :shaka, :laka
+
+      custom_status :jam_level, %i(heating_up on_fire)
     end
 
-    before do
-      allow(EmptyModel).to receive(:include).with(SimplestStatus::ModelMethods)
+    describe ".statuses" do
+      it { expect(EmptyModel.statuses).to eq(:boom => 0, :shaka => 1, :laka => 2) }
     end
 
-    it "adds the .statuses method" do
-      expect(EmptyModel.statuses(:boom, :shaka, :laka)).to eq(:boom => 0, :shaka => 1, :laka => 2)
+    describe ".custom_status" do
+      it { expect(EmptyModel.jam_levels).to eq(:heating_up => 0, :on_fire => 1) }
     end
   end
 end

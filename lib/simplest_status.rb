@@ -5,12 +5,18 @@ module SimplestStatus
   autoload :ModelMethods,     'simplest_status/model_methods'
 
   def statuses(*status_list)
-    @statuses ||= status_list.reduce(StatusCollection.new) do |collection, status|
-      collection.add(status)
-    end
+    instance_variable_get(:@statuses) || custom_status(:status, status_list)
+  end
 
-    send(:include, ModelMethods) unless ancestors.include? ModelMethods
+  def custom_status(field_name, values)
+    status_collection_for(field_name, values).configure_for(self)
+  end
 
-    @statuses
+  private
+
+  def status_collection_for(status_method, values)
+    values.reduce(StatusCollection.new(status_method)) do |collection, value|
+      collection.add(value)
+    end.configure_for(self)
   end
 end

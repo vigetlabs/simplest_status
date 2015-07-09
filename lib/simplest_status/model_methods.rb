@@ -1,61 +1,79 @@
 module SimplestStatus
-  module ModelMethods
-    def self.included(base)
-      Configurator.new(base).configure
+  class ModelMethods
+    attr_reader :model, :statuses
+
+    def initialize(model, statuses)
+      @model    = model
+      @statuses = statuses
+    end
+
+    def add
+      define_statuses_accessor_for statuses
+
+      populate_statuses
+
+      process_each_status
+
+      define_status_label_method_for statuses
+
+      set_validations_for statuses
     end
 
     private
 
-    class Configurator < Struct.new(:model)
-      def configure
-        model.statuses.each do |status|
-          set_constant_for status
-          define_class_methods_for status
-          define_instance_methods_for status
-        end
-
-        define_status_label_method
-        set_validations
+    def define_statuses_accessor_for(statuses)
+      model.send :define_singleton_method, statuses.model_accessor do
+        instance_variable_get('@' + statuses.model_accessor)
       end
+    end
 
-      private
+    def populate_statuses
+      model.send(:instance_variable_set, '@' + statuses.model_accessor, statuses)
+    end
 
-      def set_constant_for(status_info)
-        model.send :const_set, status_info.constant_name, status_info.value
+    def process_each_status
+      statuses.each do |status|
+        set_constant_for status
+        define_class_methods_for status, statuses.status_name
+        define_instance_methods_for status
       end
+    end
 
-      def define_class_methods_for(status_info)
-        model.send :define_singleton_method, status_info.symbol do
-          where(:status => status_info.value)
-        end
-      end
+    def set_constant_for(status)
+      model.send :const_set, status.constant_name, status.value
+    end
 
-      def define_instance_methods_for(status_info)
-        define_predicate(status_info)
-        define_status_setter(status_info)
+    def define_class_methods_for(status, status_name)
+      model.send :define_singleton_method, status.symbol do
+        where(status_name => status.value)
       end
+    end
 
-      def define_predicate(status_info)
-        model.send :define_method, "#{status_info.symbol}?" do
-          status == status_info.value
-        end
-      end
+    def define_instance_methods_for(status)
+      define_predicate(status, statuses.status_name)
+      define_status_setter(status, statuses.status_name)
+    end
 
-      def define_status_setter(status_info)
-        model.send :define_method, status_info.symbol do
-          update_attributes(:status => status_info.value)
-        end
+    def define_predicate(status, status_name)
+      model.send :define_method, "#{status.symbol}?" do
+        send(status_name) == status.value
       end
+    end
 
-      def define_status_label_method
-        model.send :define_method, :status_label do
-          self.class.statuses.label_for(status)
-        end
+    def define_status_setter(status, status_name)
+      model.send :define_method, status.symbol do
+        update_attributes(status_name => status.value)
       end
+    end
 
-      def set_validations
-        model.send :validates, :status, :presence => true, :inclusion => { :in => proc { model.statuses.values } }
+    def define_status_label_method_for(statuses)
+      model.send :define_method, "#{statuses.status_name}_label" do
+        self.class.send(statuses.model_accessor).label_for send(statuses.status_name)
       end
+    end
+
+    def set_validations_for(statuses)
+      model.send :validates, statuses.status_name, :presence => true, :inclusion => { :in => statuses.values }
     end
   end
 end

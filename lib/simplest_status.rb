@@ -5,10 +5,10 @@ module SimplestStatus
   autoload :ModelMethods,     'simplest_status/model_methods'
 
   def statuses(*status_list)
-    instance_variable_get(:@statuses) || custom_status(:status, status_list)
+    instance_variable_get(:@statuses) || simple_status(:status, status_list)
   end
 
-  def custom_status(field_name, values)
+  def simple_status(field_name, values)
     status_collection_for(field_name, values).configure_for(self)
   end
 

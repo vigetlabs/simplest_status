@@ -15,14 +15,14 @@ RSpec.describe SimplestStatus do
 
       statuses :boom, :shaka, :laka
 
-      custom_status :jam_level, %i(heating_up on_fire)
+      simple_status :jam_level, %i(heating_up on_fire)
     end
 
     describe ".statuses" do
       it { expect(EmptyModel.statuses).to eq(:boom => 0, :shaka => 1, :laka => 2) }
     end
 
-    describe ".custom_status" do
+    describe ".simple_status" do
       it { expect(EmptyModel.jam_levels).to eq(:heating_up => 0, :on_fire => 1) }
     end
   end

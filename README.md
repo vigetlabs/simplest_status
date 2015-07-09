@@ -1,6 +1,6 @@
 # SimplestStatus [![Gem Version](https://badge.fury.io/rb/simplest_status.svg)](http://badge.fury.io/rb/simplest_status) [![Code Climate](https://codeclimate.com/github/vigetlabs/simplest_status/badges/gpa.svg)](https://codeclimate.com/github/vigetlabs/simplest_status) [![Test Coverage](https://codeclimate.com/github/vigetlabs/simplest_status/badges/coverage.svg)](https://codeclimate.com/github/vigetlabs/simplest_status/coverage) [![Build Status](https://travis-ci.org/vigetlabs/simplest_status.svg)]((https://travis-ci.org/vigetlabs/simplest_status))
 
-SimplestStatus is a gem built to provide simple, convenient status functionality for Rails models.  It's designed to work with practically every version of Rails (tested as far back as 2.0.5) and will work with Ruby 1.9.3 and up.
+SimplestStatus is a gem built to provide simple, convenient status functionality for Rails models.  It's designed to work with any currently-supported version of Rails (tested as far back as 3.0.0) and will work with Ruby 1.9.3 and up.
 
 SimplestStatus is similar to the recently introduced [`enum`](http://api.rubyonrails.org/classes/ActiveRecord/Enum.html) (debuted in Rails 4.1), but is different in that it doesn't rely on a particular version of Rails and it also provides additional functionality like constant-based status lookup, label helpers, and validations.
 

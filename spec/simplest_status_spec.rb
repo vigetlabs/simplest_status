@@ -15,7 +15,7 @@ RSpec.describe SimplestStatus do
 
       statuses :boom, :shaka, :laka
 
-      simple_status :jam_level, %i(heating_up on_fire)
+      simple_status :jam_level, [:heating_up, :on_fire]
     end
 
     describe ".statuses" do

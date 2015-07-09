@@ -38,7 +38,7 @@ class Post < ActiveRecord::Base
 
   statuses :draft, :preview, :published, :archived
 
-  simple_status :locale, %i(english spanish russian)
+  simple_status :locale, [:english, :spanish, :russian]
 end
 ```
 This will generate a number of constants, methods, and model validations.

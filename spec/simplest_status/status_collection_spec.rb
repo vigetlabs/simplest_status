@@ -5,7 +5,7 @@ RSpec.describe SimplestStatus::StatusCollection do
   let(:shaka) { SimplestStatus::Status.new([:shaka, 1]) }
   let(:laka)  { SimplestStatus::Status.new([:laka, 2]) }
 
-  subject { described_class.new }
+  subject { described_class.new(:status) }
 
   describe "#each" do
     subject { described_class.new.merge!(:boom => 0, :shaka => 1, :laka => 2) }
@@ -41,8 +41,8 @@ RSpec.describe SimplestStatus::StatusCollection do
     end
 
     context "given input that does not match a status's name or value" do
-      it "returns nil" do
-        expect(subject.status_for('boom')).to eq nil
+      it "returns a NullStatus" do
+        expect(subject.status_for('boom')).to be_an_instance_of SimplestStatus::StatusCollection::NullStatus
       end
     end
   end
@@ -78,5 +78,27 @@ RSpec.describe SimplestStatus::StatusCollection do
     subject { described_class.new.merge!(:boom => 0, :shaka => 1, :laka => 2) }
 
     it { expect(subject.for_select).to eq [['Boom', 0], ['Shaka', 1], ['Laka', 2]] }
+  end
+
+  describe "#configure_for" do
+    let(:methods) { double('SimplestStatus::ModelMethods') }
+
+    before do
+      allow(SimplestStatus::ModelMethods).to receive(:new).with(String, subject).and_return(methods)
+    end
+
+    it "configures the given model with the status collection" do
+      expect(methods).to receive(:add)
+
+      subject.configure_for(String)
+    end
+  end
+
+  describe "#status_name" do
+    it { expect(subject.status_name).to eq :status }
+  end
+
+  describe "#model_accessor" do
+    it { expect(subject.model_accessor).to eq 'statuses' }
   end
 end

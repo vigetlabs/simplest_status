@@ -1,3 +1,5 @@
+require "active_support/inflector"
+
 module SimplestStatus
   autoload :Status, 'simplest_status/status'
 
@@ -14,9 +16,7 @@ module SimplestStatus
     alias :value_for :[]
 
     def status_for(input)
-      find do |status|
-        status.matches? input
-      end
+      find { |status| status.matches?(input) } || NullStatus.new
     end
 
     def add(status, value = self.size)
@@ -30,5 +30,21 @@ module SimplestStatus
     def for_select
       map(&:for_select)
     end
+
+    def configure_for(model)
+      tap { ModelMethods.new(model, self).add }
+    end
+
+    def status_name
+      default
+    end
+
+    def model_accessor
+      status_name.to_s.pluralize
+    end
+
+    private
+
+    NullStatus = Struct.new(:value)
   end
 end

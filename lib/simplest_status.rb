@@ -17,6 +17,6 @@ module SimplestStatus
   def status_collection_for(status_method, values)
     values.reduce(StatusCollection.new(status_method)) do |collection, value|
       collection.add(value)
-    end.configure_for(self)
+    end
   end
 end
